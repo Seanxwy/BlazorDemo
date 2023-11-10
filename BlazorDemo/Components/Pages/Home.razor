@@ -1,0 +1,92 @@
+﻿@page "/"
+@using BlazorDemo.Data
+@using Blazored.FluentValidation
+@using System.Text.Json
+@inject AddressService AddressService
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<p class="mb-5">
+    <a href="/?id=1">edit id=1</a>
+</p>
+
+<EditForm FormName="address" Model="Model" OnValidSubmit="OnSubmit" method="post" Enhance>
+    <FluentValidationValidator />
+    <div class="mb-3">
+        <Label>City</Label>
+        <InputText @bind-Value="@Model.City"></InputText>
+        <ValidationMessage For="()=>Model.City"></ValidationMessage>
+    </div>
+    <div class="mb-3">
+        <Label>State</Label>
+        <InputText @bind-Value="@Model.State"></InputText>
+        <ValidationMessage For="()=>Model.State"></ValidationMessage>
+    </div>
+    <div class="mb-3">
+        <Label>Street</Label>
+        <InputText @bind-Value="@Model.Street"></InputText>
+        <ValidationMessage For="()=>Model.Street"></ValidationMessage>
+    </div>
+    <div class="mb-3">
+        <Label>Zip</Label>
+        <InputText @bind-Value="@Model.Zip"></InputText>
+        <ValidationMessage For="()=>Model.Zip"></ValidationMessage>
+    </div>
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</EditForm>
+
+
+
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Address Model { get; set; } = new();
+    EditContext editContext { get; set; } = default;
+
+    protected override void OnInitialized()
+    {
+        Model ??= new();
+        editContext = new EditContext(Model);
+        base.OnInitialized();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        LoadData();
+        return base.OnParametersSetAsync();
+    }
+
+    void LoadData()
+    {
+        if (Id > 0)
+        {
+            var data =  AddressService.Get(Id);
+            Model.Id = data.Id;
+            Model.State = data.State;
+            Model.Street = data.Street;
+            Model.City = data.City;
+            Model.Zip = data.Zip;
+        }
+    }
+
+    void OnSubmit()
+    {
+        if (editContext.Validate())
+        {
+            Console.WriteLine(JsonSerializer.Serialize(Model));
+
+            // When the ID is = 0
+            // { "Id":1,"Street":"Street 001","City":"City 001","State":"USA","Zip":"Zip 001"}
+        }
+    }
+
+}
