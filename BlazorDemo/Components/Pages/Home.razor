@@ -61,6 +61,7 @@ Welcome to your new app.
 
     protected override Task OnParametersSetAsync()
     {
+        //If the POST behavior is recognized, then subsequent logic can be dispensed with
         LoadData();
         return base.OnParametersSetAsync();
     }
@@ -76,6 +77,10 @@ Welcome to your new app.
             Model.City = data.City;
             Model.Zip = data.Zip;
         }
+        else
+        {
+            //Other data logic
+        }
     }
 
     void OnSubmit()
@@ -84,7 +89,7 @@ Welcome to your new app.
         {
             Console.WriteLine(JsonSerializer.Serialize(Model));
 
-            // When the ID is = 0
+            // When the ID is = 0,The data submitted by the form is replaced
             // { "Id":1,"Street":"Street 001","City":"City 001","State":"USA","Zip":"Zip 001"}
         }
     }
